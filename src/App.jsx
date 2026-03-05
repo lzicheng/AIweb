@@ -24,12 +24,18 @@ const DAILY_TASKS = [
   {
     time: "15:15",
     title: "任务执行中",
-    steps: ["启动实时数据处理流水线", "执行模型训练/推理任务", "监控资源与吞吐，处理重试"],
+    steps: [
+      "启动实时数据处理流水线",
+      { id: "1", text: "执行模型训练/推理任务", controlMode: "external" },
+      "监控资源与吞吐，处理重试",
+    ],
   },
   {
     time: "15:30",
     title: "系统部署",
-    steps: ["发布构建产物", "执行灰度/回滚策略检查", "进行系统健康检查与验收"],
+    steps: ["发布构建产物", 
+      { id: "2", text: "执行灰度/回滚策略检查", controlMode: "external" },
+       "进行系统健康检查与验收"],
   },
   {
     time: "16:00",
@@ -59,6 +65,22 @@ const DAILY_TASKS = [
 ];
 
 const API_URL = "/teams/ops_team/runs";
+const STEP_STATES_API_URL = "/ops-events/step-states";
+const EXTERNAL_STATUS_FALLBACK = "pending";
+
+const STEP_STATUS_LABELS = {
+  pending: "待开始",
+  running: "执行中",
+  success: "已完成",
+  error: "异常需关注",
+};
+
+const STEP_STATUS_CLASSNAMES = {
+  pending: "bg-slate-100 text-slate-600",
+  running: "bg-amber-100 text-amber-700",
+  success: "bg-emerald-100 text-emerald-700",
+  error: "bg-rose-100 text-rose-700",
+};
 
 const toMinute = (hhmm) => {
   const [h, m] = hhmm.split(":").map(Number);
@@ -117,6 +139,37 @@ const toDayTime = (baseDate, hhmm, dayOffset = 0) => {
 
 const clamp01 = (value) => Math.max(0, Math.min(1, value));
 const lerp = (a, b, t) => a + (b - a) * t;
+const makeStepId = (task, taskIndex, stepIndex) =>
+  `${task.time.replace(":", "")}-${taskIndex + 1}-${stepIndex + 1}`;
+const normalizeStep = (rawStep, task, taskIndex, stepIndex) => {
+  if (typeof rawStep === "string") {
+    return {
+      id: makeStepId(task, taskIndex, stepIndex),
+      text: rawStep,
+      controlMode: "auto",
+    };
+  }
+  if (!rawStep || typeof rawStep !== "object") {
+    return null;
+  }
+  const text = typeof rawStep.text === "string" ? rawStep.text.trim() : "";
+  if (!text) return null;
+  return {
+    id: typeof rawStep.id === "string" && rawStep.id.trim() ? rawStep.id : makeStepId(task, taskIndex, stepIndex),
+    text,
+    controlMode: rawStep.controlMode === "external" ? "external" : "auto",
+  };
+};
+const normalizeTaskSteps = (task, taskIndex) => {
+  const rawSteps = Array.isArray(task?.steps) ? task.steps : [];
+  return rawSteps.map((step, stepIndex) => normalizeStep(step, task, taskIndex, stepIndex)).filter(Boolean);
+};
+const normalizeExternalStatus = (status) => {
+  if (status === "running" || status === "success" || status === "error" || status === "pending") {
+    return status;
+  }
+  return EXTERNAL_STATUS_FALLBACK;
+};
 
 const buildTimelineState = (now) => {
   const base = new Date(now);
@@ -195,6 +248,7 @@ const buildTimelineState = (now) => {
 
 function TimelineTab() {
   const [now, setNow] = useState(() => new Date());
+  const [externalStepStateMap, setExternalStepStateMap] = useState({});
   const timeline = useMemo(() => buildTimelineState(now), [now]);
   const axisRef = useRef(null);
   const dotRefs = useRef([]);
@@ -204,6 +258,39 @@ function TimelineTab() {
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000);
     return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    let disposed = false;
+
+    const pullStepStates = async () => {
+      try {
+        const response = await fetch(STEP_STATES_API_URL, { headers: { accept: "application/json" } });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (disposed || !Array.isArray(data?.states)) return;
+        const nextMap = {};
+        data.states.forEach((item) => {
+          const stepId = typeof item?.stepId === "string" ? item.stepId : "";
+          if (!stepId) return;
+          nextMap[stepId] = {
+            status: normalizeExternalStatus(item.status),
+            message: typeof item?.message === "string" ? item.message : "",
+            updatedAt: typeof item?.updatedAt === "string" ? item.updatedAt : "",
+          };
+        });
+        setExternalStepStateMap(nextMap);
+      } catch {
+        // 事件服务不可用时保持前端默认状态，不打断主流程
+      }
+    };
+
+    pullStepStates();
+    const timer = window.setInterval(pullStepStates, 3000);
+    return () => {
+      disposed = true;
+      window.clearInterval(timer);
+    };
   }, []);
 
   useLayoutEffect(() => {
@@ -248,12 +335,28 @@ function TimelineTab() {
   const focusTask = DAILY_TASKS[focusOcc.baseIndex];
   const nextOcc = timeline.nextOccurrence;
   const nextTask = nextOcc ? DAILY_TASKS[nextOcc.baseIndex] : DAILY_TASKS[0];
-  const focusSteps = useMemo(() => {
+  const focusTaskSteps = useMemo(() => {
     if (!focusTask) return [];
-    if (Array.isArray(focusTask.steps)) return focusTask.steps.filter(Boolean);
-    const desc = typeof focusTask.description === "string" ? focusTask.description.trim() : "";
-    return desc ? [desc] : [];
-  }, [focusTask]);
+    const autoStatus = timeline.isCompleted ? "success" : timeline.isArrived ? "running" : "pending";
+    return normalizeTaskSteps(focusTask, focusOcc.baseIndex).map((step) => {
+      const runtime = externalStepStateMap[step.id];
+      const status = step.controlMode === "external"
+        ? normalizeExternalStatus(runtime?.status)
+        : autoStatus;
+      return {
+        ...step,
+        status,
+        message: runtime?.message || "",
+      };
+    });
+  }, [externalStepStateMap, focusOcc.baseIndex, focusTask, timeline.isArrived, timeline.isCompleted]);
+  const focusTaskSummary = useMemo(() => {
+    const statuses = focusTaskSteps.map((step) => step.status);
+    if (statuses.includes("error")) return "任务存在异常，请关注并处理。";
+    if (focusTaskSteps.length > 0 && statuses.every((status) => status === "success")) return "任务步骤已完成。";
+    if (statuses.includes("running")) return "任务执行中。";
+    return "任务等待外部事件或时间驱动更新。";
+  }, [focusTaskSteps]);
 
   return (
     <section className="relative h-full overflow-hidden rounded-[28px] border border-white/40 bg-white/70 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.12)] backdrop-blur-xl">
@@ -359,24 +462,39 @@ function TimelineTab() {
           <h3 className="text-2xl font-semibold text-slate-900">
             {focusTask.time} · {focusTask.title}
           </h3>
-          {focusSteps.length ? (
+          {focusTaskSteps.length ? (
             <ul className="mt-3 space-y-2 text-slate-700">
-              {focusSteps.map((step, idx) => (
+              {focusTaskSteps.map((step, idx) => (
                 <li key={`${focusTask.time}-${idx}`} className="flex gap-3">
                   <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-semibold text-emerald-700">
                     {idx + 1}
                   </span>
-                  <span className="leading-relaxed">{step}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="leading-relaxed">{step.text}</p>
+                    {step.controlMode === "external" ? (
+                      <>
+                        <div className="mt-1 flex items-center gap-2 text-xs">
+                          <span
+                            className={`inline-flex rounded-full px-2 py-0.5 font-medium ${STEP_STATUS_CLASSNAMES[step.status] || STEP_STATUS_CLASSNAMES.pending}`}
+                          >
+                            {STEP_STATUS_LABELS[step.status] || STEP_STATUS_LABELS.pending}
+                          </span>
+                        </div>
+                        {step.message ? <p className="mt-1 text-xs text-slate-500">{step.message}</p> : null}
+                      </>
+                    ) : null}
+                  </div>
                 </li>
               ))}
             </ul>
           ) : null}
+          <p className="mt-3 text-sm text-slate-700">{focusTaskSummary}</p>
           {timeline.isArrived ? (
-            <p className="mt-3 text-sm text-slate-700">
+            <p className="mt-2 text-sm text-slate-700">
               已到达该节点，距离下一任务还有 <span className="font-semibold">{formatDuration(timeline.minutesToMove)}</span>。
             </p>
           ) : (
-            <p className="mt-3 text-sm text-slate-700">
+            <p className="mt-2 text-sm text-slate-700">
               距离下一任务开始约 <span className="font-semibold">{formatDuration(timeline.minutesToArrive)}</span>。
             </p>
           )}
