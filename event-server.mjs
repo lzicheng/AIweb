@@ -3,7 +3,7 @@ import http from "node:http";
 const PORT = 8787;
 const HOST = "0.0.0.0";
 
-const EXTERNAL_STEP_IDS = new Set(["1", "2"]);
+const EXTERNAL_STEP_IDS = new Set(["1", "2", "3", "4", "5", "6", "7", "8"]);
 const stepStates = new Map();
 const eventIds = new Set();
 

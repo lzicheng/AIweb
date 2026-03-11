@@ -12,56 +12,459 @@ import {
 
 const DAILY_TASKS = [
   {
-    time: "14:00",
-    title: "开始",
-    steps: ["初始化资源", "加载当天运行参数", "检查依赖服务与权限状态"],
-  },
-  {
-    time: "14:30",
-    title: "数据同步",
-    steps: ["拉取业务数据与监控指标", "进行基础校验与缺失修复", "输出同步摘要与异常告警"],
-  },
-  {
-    time: "15:15",
-    title: "任务执行中",
+    time: "8:00",
+    title: "日常巡检",
     steps: [
-      "启动实时数据处理流水线",
-      { id: "1", text: "执行模型训练/推理任务", controlMode: "external" },
-      "监控资源与吞吐，处理重试",
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      "后置报表（查看行长报表是否已出）",
+      "ADS流量巡检",
+      "三条IPV6线路流量巡检",
+      "二代生产HMC巡检",
+      "生产区、OA区数据库延时巡检并将结果发送至微信‘系统运营群’",
+      "远程运维应急方案“数仓批处理时间”权限关闭"
     ],
   },
   {
-    time: "15:30",
-    title: "系统部署",
-    steps: ["发布构建产物", 
-      { id: "2", text: "执行灰度/回滚策略检查", controlMode: "external" },
-       "进行系统健康检查与验收"],
+    time: "8:30",
+    title: "批处理",
+    steps: [
+      "检查理财3.0批处理日启清算是否已运行",
+      "检查理财6.0批处理日启清算是否已运行（工作日做）"
+    ],
+  },
+  {
+    time: "9:00",
+    title: "日常巡检",
+    steps: [
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      { id: "7", text: "后置一体机数据库巡检（sdata）", controlMode: "external" },
+      "ADS流量巡检",
+      "三条IPV6线路流量巡检",
+      "二代生产HMC巡检",
+      "短信平台巡检",
+      "Oracle数据库空间可用性巡检",
+      "远程运维应急方案“每周一执行”权限开启（每周一做）"
+    ],
+  },
+  {
+    time: "9:30",
+    title: "日常巡检和批处理",
+    steps: [
+      "远程运维应急方案“每周一执行”权限关闭（每周一做）",
+      "Neteagle(支行线路故障)",
+      "Neteagle(离行点线路故障)旬末检查上报",
+      "检查理财6.0批处理的理财清算日启是否完成（非工作日检查）",
+      "积分系统批处理巡检"
+    ],
+  },
+  {
+    time: "10:00",
+    title: "日常巡检",
+    steps: [
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      "IP封堵检查",
+      "光纤交换机端口状态巡检",
+      "二代生产HMC巡检"
+    ],
+  },
+  {
+    time: "11:00",
+    title: "日常巡检和批处理",
+    steps: [
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      "ADS流量巡检",
+      "三条IPV6线路流量巡检",
+      "Neteagle(支行线路故障)",
+      "Neteagle(离行点线路故障)旬末检查上报",
+      "检查理财3.0批处理日启清算是否已完成",
+      "执行理财6.0批处理的交易中心清算日启是否已完成（非工作日做）"
+    ],
+  },
+  {
+    time: "12:00",
+    title: "日常巡检",
+    steps: [
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      "二代生产HMC巡检",
+      "二代核心开发HMC巡检",
+      "12:00~14:00关注即时通“运营技术支持群”是否有网点反馈问题信息"
+    ],
+  },
+  {
+    time: "13:00",
+    title: "日常巡检",
+    steps: [
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      "二代生产HMC巡检",
+      "12:00~14:00关注即时通“运营技术支持群”是否有网点反馈问题信息"
+    ],
+  },
+  {
+    time: "14:00",
+    title: "日常巡检",
+    steps: [
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      "存储、交换机巡检",
+      "ADS流量巡检",
+      "三条IPV6线路流量巡检"
+    ],
+  },
+  {
+    time: "15:00",
+    title: "日常巡检",
+    steps: [
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      "二代生产HMC巡检",
+      "IP封堵检查"
+    ],
   },
   {
     time: "16:00",
-    title: "验证完成",
-    steps: ["验收核心流程", "归档执行结果与日志", "生成日报并通知相关人"],
-  },
-  {
-    time: "16:13",
-    title: "验证完成后续",
-    steps: ["验收核心流程", "归档执行结果与日志", "生成日报并通知相关人"],
-  },
-  {
-    time: "16:14",
-    title: "验证完成后续",
-    steps: ["验收核心流程", "归档执行结果与日志", "生成日报并通知相关人"],
-  },
-  {
-    time: "16:15",
-    title: "验证完成后续",
-    steps: ["验收核心流程", "归档执行结果与日志", "生成日报并通知相关人"],
+    title: "日常巡检和批处理",
+    steps: [
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      "检查理财6.0批处理的理财清算日终是否完成（非工作日检查）"
+    ],
   },
   {
     time: "16:30",
-    title: "验证完成后续",
-    steps: ["验收核心流程", "归档执行结果与日志", "生成日报并通知相关人", "归档执行结果与日志", "生成日报并通知相关人", "归档执行结果与日志", "归档执行结果与日志", "归档执行结果与日志", "归档执行结果与日志", "归档执行结果与日志", "归档执行结果与日志", "归档执行结果与日志",],
+    title: "批处理和变更日志",
+    steps: [
+      "执行理财3.0批处理的日终清算（非工作日做）",
+      "每日变更日志收集"
+    ],
   },
+  {
+    time: "17:00",
+    title: "日常巡检和其他",
+    steps: [
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      "二代生产HMC巡检",
+      "每日变更日志收集表格发送至即时通“科技运营部业务连续性工作群”",
+      "验证远程运维方案可用性（使用专用笔记本验证）"
+    ],
+  },
+  {
+    time: "18:00",
+    title: "日常巡检",
+    steps: [
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      "IP封堵检查",
+      "ADS流量巡检",
+      "三条IPV6线路流量巡检",
+      "二代生产HMC巡检",
+      "短信平台巡检"
+    ],
+  },
+  {
+    time: "18:30",
+    title: "批处理",
+    steps: [
+      "检查理财3.0批处理的日终清算是否完成，及系统是否日切到第二天的日期",
+      "检查理财6.0批处理的日终清算是否完成，及系统是否日切到第二天的日期"
+    ],
+  },
+  {
+    time: "19:00",
+    title: "应急预案备份",
+    steps: [
+      "应急预案电子文档备份"
+    ],
+  },
+  {
+    time: "19:30",
+    title: "值班信息发送",
+    steps: [
+      "发送第二天机房值班人员信息至微信“运行组两地工作沟通群”"
+    ],
+  },
+  {
+    time: "20:00",
+    title: "日常巡检",
+    steps: [
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      { id: "7", text: "后置一体机数据库巡检（sdata）", controlMode: "external" },
+      "ADS流量巡检",
+      "三条IPV6线路流量巡检",
+      "二代生产HMC巡检",
+      "光纤交换机端口状态巡检"
+    ],
+  },
+  {
+    time: "20:30",
+    title: "应急预案权限开启",
+    steps: [
+      "远程运维应急方案“财务类系统批处理时间”权限开启"
+    ],
+  },
+  {
+    time: "21:00",
+    title: "日常巡检",
+    steps: [
+      "IP封堵检查",
+      "二代生产HMC巡检",
+      "电话银行巡检（拨打三个电话）",
+      "短信平台巡检",
+      "后置报表（检查是否还存在跑批任务）",
+      "Oracle数据库空间可用性巡检",
+      "OA区数据库延时巡检",
+      "重启罗湖机房场地监控系统客户端"
+    ],
+  },
+  {
+    time: "21:45",
+    title: "应急预案权限开启",
+    steps: [
+      "远程运维应急方案“数仓、LOS批处理时间”权限开启"
+    ],
+  },
+  {
+    time: "22:00",
+    title: "日常巡检",
+    steps: [
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      "二代生产HMC巡检",
+      "远程运维应急方案“三代核心批处理时间”权限开启"
+    ],
+  },
+  {
+    time: "22:30",
+    title: "其他",
+    steps: [
+      "检查机房钥匙、移动操作台领用登记情况"
+    ],
+  },
+  {
+    time: "23:00",
+    title: "日常巡检和批处理",
+    steps: [
+      { id: "8", text: "外围系统ORACLE数据库巡检", controlMode: "external" },
+      "IP封堵检查",
+      "ADS流量巡检",
+      "三条IPV6线路流量巡检",
+      "二代生产HMC巡检",
+      "提交三代核心批处理【三代核心联合主批】"
+    ],
+  },
+  {
+    time: "23:05",
+    title: "影像系统例行重启",
+    steps: [
+      "影像系统例行重启（每周二晚，三代核心提批后操作）"
+    ],
+  },
+  {
+    time: "00:00",
+    title: "日常巡检和批处理",
+    steps: [
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      { id: "7", text: "后置一体机数据库巡检（sdata）", controlMode: "external" },
+      "二代生产HMC巡检",
+      "0点日切后，检查三代核心批处理是否续跑",
+      "远程运维应急方案“信用卡批处理时间”权限开启",
+      "场地监控、三楼供电参数表备份并拷贝至场地监控备份专用U盘（每月1日晚班操作）"
+    ],
+  },
+  {
+    time: "00:10",
+    title: "批处理",
+    steps: [
+      "ATMP自动批处理结果确认",
+      "注：0:30之前未收到跑批结束提示信息需及时通知詹铭毅"
+    ],
+  },
+  {
+    time: "00:15",
+    title: "批处理",
+    steps: [
+      "信用卡批处理",
+      "注：0:30之前未收到信用卡跑批开始告警需立即通知信用卡值班人员"
+    ],
+  },
+  {
+    time: "00:25",
+    title: "批处理",
+    steps: [
+      { id: "1", text: "三代生成银联对账文件检查（0:25后可检查）", controlMode: "external" }
+    ],
+  },
+  {
+    time: "00:40",
+    title: "批处理",
+    steps: [
+      { id: "2", text: "0:40~0:50，后置文件报送任务自动SQL指令巡检", controlMode: "external" }
+    ],
+  },
+  {
+    time: "00:50",
+    title: "批处理",
+    steps: [
+      "0:50前登录LOS跑批页面，检查节点“新核心文件处理”是否在跑",
+      "注：后续每隔半小时需关注一下跑批是否正常及关键节点是否在规定时间内已运行"
+    ],
+  },
+  {
+    time: "01:00",
+    title: "日常巡检和批处理",
+    steps: [
+      "IP封堵检查",
+      "二代生产HMC巡检",
+      "回单文件下载检查"
+    ],
+  },
+  {
+    time: "01:30",
+    title: "批处理",
+    steps: [
+      "上送大总账表外账文件任务巡检（los批处理节点检查“上送保函表外账文件”是否已执行完成）"
+    ],
+  },
+  {
+    time: "01:40",
+    title: "批处理",
+    steps: [
+      { id: "3", text: "1:40~1:50，上送大总账表外账文件任务自动SQL指令巡检", controlMode: "external" }
+    ],
+  },
+  {
+    time: "02:00",
+    title: "日常巡检和批处理",
+    steps: [
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      "短信平台巡检",
+      "后置报表（是否能正常登录）",
+      "二代生产HMC巡检",
+      "财务大总账系统日常巡检（平时2:00检查，月底则是2:50检查）",
+      "检查LOS批处理任务“更新押品登记机构”是否执行完成",
+      "LOS回传给核心的数据检查（上送核心文件为“执行成功”即可检查）",
+      "电话银行巡检（拨打三个电话）",
+      { id: "4", text: "操作员外围操作检查（中间业务/渠道运行情况检查；dataexchg/integrator/网银日切检查）", controlMode: "external" }
+    ],
+  },
+  {
+    time: "02:30",
+    title: "批处理",
+    steps: [
+      "若超过2:30分，仍未收到信用卡跑批结束告警，则按照相关步骤检查"
+    ],
+  },
+  {
+    time: "02:50",
+    title: "批处理",
+    steps: [
+      "财务大总账系统日常巡检（平时2:00检查，月底则是2:50检查）",
+      { id: "5", text: "财务资产负债批处理检查（是否开始跑批及有无报错）（月底3:20检查）", controlMode: "external" }
+    ],
+  },
+  {
+    time: "03:00",
+    title: "日常巡检",
+    steps: [
+      { id: "7", text: "后置一体机数据库巡检（sdata）", controlMode: "external" },
+      "IP封堵检查",
+      "二代生产HMC巡检",
+      "北塔告警、数据库延时看板确认检查（查看是否存在未通知异常告警）",
+      "3:00-8:00期间可录入场地监控UPS数据电流录入（前一天数据）"
+    ],
+  },
+  {
+    time: "03:30",
+    title: "批处理",
+    steps: [
+      { id: "6", text: "财务资产负债批处理检查（跑批是否正常完成）（月底4:00检查）", controlMode: "external" }
+    ],
+  },
+  {
+    time: "04:00",
+    title: "日常巡检",
+    steps: [
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      "后置报表（是否能正常登录）",
+      "二代生产HMC巡检"
+    ],
+  },
+  {
+    time: "05:00",
+    title: "日常巡检",
+    steps: [
+      "IP封堵检查",
+      "二代生产HMC巡检",
+      "5:00左右检查销管批处理完成情况（转发钉钉提示信息）"
+    ],
+  },
+  {
+    time: "05:30",
+    title: "日常巡检",
+    steps: [
+      "个人手机先机、有数app登录检查",
+      "5:00左右检查销管批处理完成情况（转发钉钉提示信息）"
+    ],
+  },
+  {
+    time: "06:00",
+    title: "日常巡检",
+    steps: [
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      { id: "7", text: "后置一体机数据库巡检（sdata）", controlMode: "external" },
+      "IP封堵检查",
+      "ADS流量巡检",
+      "三条IPV6线路流量巡检",
+      "二代生产HMC巡检",
+      "二代核心开发HMC巡检",
+      "短信平台巡检",
+      "电话银行巡检（拨打三个电话）",
+      "3:00-8:00期间可录入场地监控UPS数据电流录入（前一天数据）",
+    ],
+  },
+  {
+    time: "06:30",
+    title: "日常巡检",
+    steps: [
+      "三代柜面影像验印检查【影像采集（扫描仪）、影像采集（高拍仪）、人工验印】",
+      "跑批时间统计表上传至ITIL",
+      "SmartMonitor-JMS监控每日例行重启、客户端需手动"
+    ],
+  },
+  {
+    time: "07:00",
+    title: "日常巡检",
+    steps: [
+      "巡检31个IPV4网银页（保留手动巡检）、巡检31个IPV6网银页",
+      "手机银行APP登录巡检",
+      "二代生产HMC巡检",
+      "个人手机移动办公app（智慧办公app）检查",
+      "远程运维应急方案“三代核心批处理时间”权限关闭",
+      "远程运维应急方案“信用卡批处理时间”权限关闭",
+      "远程运维应急方案“LOS批处理时间关闭”权限关闭",
+      "远程运维应急方案“财务类系统批处理时间”权限关闭"
+    ],
+  },
+  //{
+  //  time: "15:15",
+  //  title: "任务执行中",
+  //  steps: [
+  //    "启动实时数据处理流水线",
+  //    { id: "1", text: "执行模型训练/推理任务", controlMode: "external" },
+  //    "监控资源与吞吐，处理重试",
+  //  ],
+  //},
 ];
 
 const API_URL = "/teams/ops_team/runs";
@@ -129,6 +532,10 @@ const extractAssistantText = (data) => {
 };
 
 const minutesBetween = (a, b) => (b.getTime() - a.getTime()) / 60000;
+const timeToMinutes = (hhmm) => {
+  const [hh, mm] = hhmm.split(":").map(Number);
+  return hh * 60 + mm;
+};
 const toDayTime = (baseDate, hhmm, dayOffset = 0) => {
   const d = new Date(baseDate);
   const [hh, mm] = hhmm.split(":").map(Number);
@@ -164,6 +571,10 @@ const normalizeTaskSteps = (task, taskIndex) => {
   const rawSteps = Array.isArray(task?.steps) ? task.steps : [];
   return rawSteps.map((step, stepIndex) => normalizeStep(step, task, taskIndex, stepIndex)).filter(Boolean);
 };
+const getExternalStepIds = (task, taskIndex) =>
+  normalizeTaskSteps(task, taskIndex)
+    .filter((step) => step.controlMode === "external")
+    .map((step) => step.id);
 const normalizeExternalStatus = (status) => {
   if (status === "running" || status === "success" || status === "error" || status === "pending") {
     return status;
@@ -182,8 +593,9 @@ const buildTimelineState = (now) => {
       const task = DAILY_TASKS[i];
       const start = toDayTime(base, task.time, dayOffset);
       const nextIndex = (i + 1) % taskCount;
-      const nextDayOffset = dayOffset + (nextIndex === 0 ? 1 : 0);
-      const moveAt = toDayTime(base, DAILY_TASKS[nextIndex].time, nextDayOffset);
+      const nextTask = DAILY_TASKS[nextIndex];
+      const nextDayOffset = dayOffset + (timeToMinutes(nextTask.time) < timeToMinutes(task.time) ? 1 : 0);
+      const moveAt = toDayTime(base, nextTask.time, nextDayOffset);
       const completeAt = new Date(start.getTime() + 10 * 60 * 1000);
       occurrences.push({
         baseIndex: i,
@@ -212,7 +624,7 @@ const buildTimelineState = (now) => {
   const isArrived = now.getTime() >= center.start.getTime();
   const isCompleted = now.getTime() >= center.completeAt.getTime();
 
-  // 进度（严格按系统时间）：在 prev.moveAt -> center.start 之间从“上一个点”推进到“中心点”
+  // 进度（严格按系统时间）：在 prev.start -> center.start 之间从“上一个点”推进到“中心点”
   // 到达后在 center.start -> center.moveAt 之间从“中心点”推进到“下一个点”
   let progressFromIndex = 2;
   let progressToIndex = 2;
@@ -220,8 +632,9 @@ const buildTimelineState = (now) => {
   if (!isArrived) {
     progressFromIndex = 1;
     progressToIndex = 2;
-    const denom = Math.max(1, minutesBetween(prev.moveAt, center.start));
-    progressT = clamp01(minutesBetween(prev.moveAt, now) / denom);
+    const approachStart = prev?.start ?? center.start;
+    const denom = Math.max(1, minutesBetween(approachStart, center.start));
+    progressT = clamp01(minutesBetween(approachStart, now) / denom);
   } else {
     progressFromIndex = 2;
     progressToIndex = 3;
@@ -252,6 +665,8 @@ function TimelineTab() {
   const timeline = useMemo(() => buildTimelineState(now), [now]);
   const axisRef = useRef(null);
   const dotRefs = useRef([]);
+  const clearedStepAtRef = useRef({});
+  const previousFocusOccurrenceRef = useRef(null);
   const [axisWidth, setAxisWidth] = useState(null);
   const [dotCenters, setDotCenters] = useState([]);
 
@@ -273,10 +688,16 @@ function TimelineTab() {
         data.states.forEach((item) => {
           const stepId = typeof item?.stepId === "string" ? item.stepId : "";
           if (!stepId) return;
+          const updatedAt = typeof item?.updatedAt === "string" ? item.updatedAt : "";
+          const clearedAt = clearedStepAtRef.current[stepId];
+          if (clearedAt && updatedAt && updatedAt <= clearedAt) return;
+          if (clearedAt && updatedAt > clearedAt) {
+            delete clearedStepAtRef.current[stepId];
+          }
           nextMap[stepId] = {
             status: normalizeExternalStatus(item.status),
             message: typeof item?.message === "string" ? item.message : "",
-            updatedAt: typeof item?.updatedAt === "string" ? item.updatedAt : "",
+            updatedAt,
           };
         });
         setExternalStepStateMap(nextMap);
@@ -335,6 +756,41 @@ function TimelineTab() {
   const focusTask = DAILY_TASKS[focusOcc.baseIndex];
   const nextOcc = timeline.nextOccurrence;
   const nextTask = nextOcc ? DAILY_TASKS[nextOcc.baseIndex] : DAILY_TASKS[0];
+  const focusOccurrenceKey = `${focusOcc.start.toISOString()}-${focusOcc.baseIndex}`;
+
+  useEffect(() => {
+    const previous = previousFocusOccurrenceRef.current;
+    if (!previous) {
+      previousFocusOccurrenceRef.current = {
+        key: focusOccurrenceKey,
+        baseIndex: focusOcc.baseIndex,
+      };
+      return;
+    }
+    if (previous.key === focusOccurrenceKey) return;
+
+    const previousTask = DAILY_TASKS[previous.baseIndex];
+    const previousStepIds = getExternalStepIds(previousTask, previous.baseIndex);
+    if (previousStepIds.length > 0) {
+      const clearedAt = new Date().toISOString();
+      previousStepIds.forEach((stepId) => {
+        clearedStepAtRef.current[stepId] = clearedAt;
+      });
+      setExternalStepStateMap((currentMap) => {
+        const nextMap = { ...currentMap };
+        previousStepIds.forEach((stepId) => {
+          delete nextMap[stepId];
+        });
+        return nextMap;
+      });
+    }
+
+    previousFocusOccurrenceRef.current = {
+      key: focusOccurrenceKey,
+      baseIndex: focusOcc.baseIndex,
+    };
+  }, [focusOcc.baseIndex, focusOccurrenceKey]);
+
   const focusTaskSteps = useMemo(() => {
     if (!focusTask) return [];
     const autoStatus = timeline.isCompleted ? "success" : timeline.isArrived ? "running" : "pending";
@@ -708,7 +1164,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-lg font-semibold leading-tight">Ops Console</h1>
-              <p className="text-xs text-slate-500">GPT Style UI</p>
+              <p className="text-xs text-slate-500">SRCB智能运维系统</p>
             </div>
           </div>
 
