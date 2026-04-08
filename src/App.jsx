@@ -1057,8 +1057,8 @@ function ChatTab({
             <MessageSquareText size={14} />
             AI 运维
           </p>
-          <h2 className="text-3xl font-semibold text-slate-900">运维助手</h2>
-          <p className="mt-1 text-sm text-slate-500">深圳农商银行运维助手</p>
+          <h2 className="text-3xl font-semibold text-slate-900">运营助手</h2>
+          <p className="mt-1 text-sm text-slate-500">深圳农商银行运营助手</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -1148,7 +1148,7 @@ function ChatTab({
 export default function App() {
   const [tab, setTab] = useState("timeline");
   const [chatMessages, setChatMessages] = useState([
-    { role: "assistant", content: "你好，我是运维助手。你可以直接输入问题，我会通过后端 API 返回结果。" },
+    { role: "assistant", content: "你好，我是运营助手。你可以直接输入问题，我会通过后端 API 返回结果。" },
   ]);
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
@@ -1164,7 +1164,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-lg font-semibold leading-tight">Ops Console</h1>
-              <p className="text-xs text-slate-500">SRCB智能运维系统</p>
+              <p className="text-xs text-slate-500">SRCB智能运营系统</p>
             </div>
           </div>
 
@@ -1189,7 +1189,7 @@ export default function App() {
                 }`}
             >
               <Workflow size={18} className="shrink-0" />
-              <span className="font-medium">运维助手</span>
+              <span className="font-medium">运营助手</span>
             </button>
           </nav>
         </aside>
