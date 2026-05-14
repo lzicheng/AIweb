@@ -23,6 +23,11 @@ export default defineConfig(({ mode }) => {
           target: env.VITE_OPS_EVENTS_PROXY_TARGET || "http://localhost:8787",
           changeOrigin: true,
         },
+        // 告警收敛系统只读态势接口
+        "/api/public": {
+          target: env.VITE_ALERT_CONVERGER_PROXY_TARGET || "http://localhost:9541",
+          changeOrigin: true,
+        },
         // 数字人 ASR/TTS 服务
         "/api/v1": {
           target: env.VITE_DIGITAL_HUMAN_PROXY_TARGET || "http://localhost:8000",

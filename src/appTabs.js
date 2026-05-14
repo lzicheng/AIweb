@@ -1,7 +1,8 @@
-import { Clock3, Sparkles, Workflow } from "lucide-react";
+import { BellRing, Clock3, Sparkles, Workflow } from "lucide-react";
 import TimelineTab from "./TimelineTab";
 import ChatTab from "./ChatTab";
 import DigitalHumanTab from "./DigitalHumanTab";
+import AlertSituationTab from "./AlertSituationTab";
 
 export const APP_TABS = [
   {
@@ -15,6 +16,12 @@ export const APP_TABS = [
     label: "运营助手",
     icon: Workflow,
     component: ChatTab,
+  },
+  {
+    id: "alert-situation",
+    label: "告警态势",
+    icon: BellRing,
+    component: AlertSituationTab,
   },
   {
     id: "digital-human",

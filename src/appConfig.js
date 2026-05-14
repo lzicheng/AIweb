@@ -1,4 +1,4 @@
-const env = import.meta.env;
+const env = import.meta.env || {};
 
 const readString = (key, fallback) => {
   const value = env[key];
@@ -13,6 +13,10 @@ const readNumber = (key, fallback) => {
 export const APP_CONFIG = {
   opsAssistantApiUrl: readString("VITE_OPS_ASSISTANT_API_URL", "/teams/ops_team/runs"),
   opsEventsStepStatesUrl: readString("VITE_OPS_EVENTS_STEP_STATES_URL", "/ops-events/step-states"),
+  alertSituation: {
+    dashboardUrl: readString("VITE_ALERT_DASHBOARD_API_URL", "/api/public/dashboard"),
+    alertsUrl: readString("VITE_ALERT_ALERTS_API_URL", "/api/public/alerts"),
+  },
   digitalHuman: {
     asrApiUrl: readString("VITE_DIGITAL_HUMAN_ASR_API_URL", "/api/v1/asr"),
     healthUrl: readString("VITE_DIGITAL_HUMAN_HEALTH_URL", "/health"),
