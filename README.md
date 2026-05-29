@@ -29,16 +29,10 @@ npm install
 npm run dev
 ```
 
-如需同步操作时序轴的事件状态，可以另开终端启动轻量事件服务：
-
-```bash
-npm run events
-```
-
 开发服务器会通过 `vite.config.js` 将下列路径代理到本地后端服务：
 
 - `/teams`：运营助手接口，默认代理到 `http://localhost:7777`
-- `/ops-events`：事件状态服务，默认代理到 `http://localhost:8787`
+- `/api/step-status`：时序轴 Step Status API，默认代理到 `http://localhost:8000`
 - `/api/public`：告警态势接口，默认代理到 `http://localhost:9541`
 - `/api/v1` 和 `/health`：数字人 ASR/TTS 服务，默认代理到 `http://localhost:8000`
 
@@ -49,7 +43,7 @@ npm run events
 | 变量 | 用途 |
 | --- | --- |
 | `VITE_OPS_ASSISTANT_API_URL` | 运营助手运行接口地址 |
-| `VITE_OPS_EVENTS_STEP_STATES_URL` | 操作步骤状态读取地址 |
+| `VITE_STEP_STATUS_API_URL` | 操作步骤状态读取地址 |
 | `VITE_ALERT_DASHBOARD_API_URL` | 告警态势仪表盘接口 |
 | `VITE_ALERT_ALERTS_API_URL` | 告警列表接口 |
 | `VITE_DIGITAL_HUMAN_ASR_API_URL` | 数字人语音识别接口 |
@@ -59,7 +53,7 @@ npm run events
 | `VITE_DIGITAL_HUMAN_MODEL_URL` | Live2D 模型入口文件地址 |
 | `VITE_DIGITAL_HUMAN_TTS_SPEED` | TTS 语速 |
 | `VITE_OPS_ASSISTANT_PROXY_TARGET` | 开发环境 `/teams` 代理目标 |
-| `VITE_OPS_EVENTS_PROXY_TARGET` | 开发环境 `/ops-events` 代理目标 |
+| `VITE_STEP_STATUS_PROXY_TARGET` | 开发环境 `/api/step-status` 代理目标 |
 | `VITE_ALERT_CONVERGER_PROXY_TARGET` | 开发环境 `/api/public` 代理目标 |
 | `VITE_DIGITAL_HUMAN_PROXY_TARGET` | 开发环境 `/api/v1` 和 `/health` 代理目标 |
 
@@ -122,4 +116,3 @@ npm run test:watch
 - `src/appTabs.js`：控制台页签注册。
 - `public/`：静态资源和 Live2D 模型资源。
 - `tools/static-server.ps1`：静态演示服务器。
-- `event-server.mjs`：操作时序轴事件状态服务。

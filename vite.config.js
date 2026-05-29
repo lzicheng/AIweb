@@ -18,9 +18,9 @@ export default defineConfig(({ mode }) => {
           target: env.VITE_OPS_ASSISTANT_PROXY_TARGET || "http://localhost:7777",
           changeOrigin: true,
         },
-        // 轻量事件服务（step 状态）
-        "/ops-events": {
-          target: env.VITE_OPS_EVENTS_PROXY_TARGET || "http://localhost:8787",
+        // 时序轴 Step Status API
+        "/api/step-status": {
+          target: env.VITE_STEP_STATUS_PROXY_TARGET || "http://localhost:8000",
           changeOrigin: true,
         },
         // 告警收敛系统只读态势接口

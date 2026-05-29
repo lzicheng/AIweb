@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => ({
     dispose: vi.fn(),
   })),
   playContent: vi.fn(),
+  queueContent: vi.fn(),
   stopPlayback: vi.fn(),
   runOpsAssistant: vi.fn(),
   recognizeSpeech: vi.fn(),
@@ -37,6 +38,7 @@ vi.mock("./live2dRenderer", () => ({
 vi.mock("./contentPlaybackService", () => ({
   createContentPlaybackService: () => ({
     playContent: mocks.playContent,
+    queueContent: mocks.queueContent,
     stop: mocks.stopPlayback,
     dispose: vi.fn(),
   }),
@@ -63,6 +65,7 @@ describe("DigitalHumanTab", () => {
     mocks.latestRecorderOptions = null;
     mocks.createLive2DRenderer.mockClear();
     mocks.playContent.mockClear();
+    mocks.queueContent.mockClear();
     mocks.stopPlayback.mockClear();
     mocks.runOpsAssistant.mockReset();
     mocks.recognizeSpeech.mockReset();
@@ -71,12 +74,31 @@ describe("DigitalHumanTab", () => {
   test("默认展示语音输入主态", () => {
     render(<DigitalHumanTab />);
 
-    expect(screen.getByText("点击开始说话")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "点击开始说话" })).toBeInTheDocument();
+    expect(screen.queryByText("点击开始说话")).not.toBeInTheDocument();
+    expect(screen.queryByText("说完后自动发送")).not.toBeInTheDocument();
     expect(screen.queryByPlaceholderText("输入你想对数字人说的话")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "结束并发送" })).not.toBeInTheDocument();
     expect(screen.queryByText("统一展示数字人听到的话、运营助手返回的消息以及当前会话状态。")).not.toBeInTheDocument();
     expect(screen.queryByText("输入方式")).not.toBeInTheDocument();
     expect(screen.queryByText("数字人回复")).not.toBeInTheDocument();
+  });
+
+  test("主内容使用剩余高度布局避免底部输入区被裁切", () => {
+    const { container } = render(<DigitalHumanTab />);
+    const rootPanel = container.firstElementChild;
+
+    expect(rootPanel).toHaveClass("flex", "flex-col");
+    expect(rootPanel?.querySelector(".h-\\[calc\\(100\\%-4\\.8rem\\)\\]")).not.toBeInTheDocument();
+  });
+
+  test("语音按钮嵌入输入控制条而不是悬浮大按钮", () => {
+    const { container } = render(<DigitalHumanTab />);
+    const voiceButton = screen.getByRole("button", { name: "点击开始说话" });
+
+    expect(container.querySelector(".voice-input-dock")).toContainElement(voiceButton);
+    expect(voiceButton).toHaveClass("h-14", "w-14");
+    expect(voiceButton).not.toHaveClass("h-[88px]", "w-[88px]");
   });
 
   test("切换到文字输入后展示文本输入框", async () => {
@@ -100,12 +122,13 @@ describe("DigitalHumanTab", () => {
     expect(screen.getByRole("tab", { name: "语音输入" })).toBeDisabled();
   });
 
-  test("展示麦克风采集诊断状态", () => {
+  test("语音按钮下方不展示麦克风采集诊断状态", () => {
     mocks.recorderState.recorderStatus = "正在请求麦克风权限";
 
     render(<DigitalHumanTab />);
 
-    expect(screen.getByText("麦克风状态：正在请求麦克风权限")).toBeInTheDocument();
+    expect(screen.queryByText("正在请求麦克风权限")).not.toBeInTheDocument();
+    expect(screen.queryByText("麦克风状态：正在请求麦克风权限")).not.toBeInTheDocument();
   });
 
   test("录音中重置会话会先停止录音", async () => {

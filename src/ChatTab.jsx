@@ -3,7 +3,7 @@ import { Bot, MessageSquareText, SendHorizontal, Sparkles } from "lucide-react";
 import { createSessionId, runOpsAssistant } from "./opsAssistantApi";
 
 const INITIAL_MESSAGES = [
-  { role: "assistant", content: "你好，我是运营助手。你可以直接输入问题，我会通过后端 API 返回结果。" },
+  { role: "assistant", content: "请输入您的问题。" },
 ];
 
 export default function ChatTab() {
@@ -49,7 +49,7 @@ export default function ChatTab() {
     setMessages([
       {
         role: "assistant",
-        content: "已开始新对话。请继续输入你的问题，我会通过后端 API 返回结果。",
+        content: "已开始新对话。请继续输入你的问题。",
       },
     ]);
     setSessionId(createSessionId());
@@ -139,11 +139,10 @@ export default function ChatTab() {
             ) : null}
 
             <div
-              className={`max-w-[78%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-sm ${
-                message.role === "user"
+              className={`max-w-[78%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-sm ${message.role === "user"
                   ? "bg-gradient-to-br from-emerald-500 to-emerald-600 text-white"
                   : "border border-slate-200 bg-white text-slate-800"
-              }`}
+                }`}
             >
               {message.content}
             </div>

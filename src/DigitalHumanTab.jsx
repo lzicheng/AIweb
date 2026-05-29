@@ -357,17 +357,6 @@ export default function DigitalHumanTab() {
   const statusLabel = isRecording ? `录音中 ${formatDuration(durationMs)}` : statusText;
   const activeError = recorderError || panelError;
   const voiceButtonLabel = isRecording ? "结束并发送" : "点击开始说话";
-  const voiceSecondaryText = !isSupported
-    ? "当前浏览器不支持 MediaRecorder，请切换到文字输入。"
-    : activeError
-      ? activeError
-      : isRecording
-        ? `已录制 ${formatDuration(durationMs)}，停止说话后会自动发送，也可以手动结束`
-        : busy
-          ? "正在处理当前会话，请稍候。"
-          : recorderStatus && recorderStatus !== "待命"
-            ? recorderStatus
-            : "说完后自动发送";
   const isVoiceActionDisabled = !isSupported || busy;
   const voiceAction = isRecording ? handleStopRecordingAndTalk : handleStartRecording;
   const showStopAction = busy || statusText === "数字人播报中";
@@ -385,7 +374,7 @@ export default function DigitalHumanTab() {
     : "";
 
   return (
-    <section className="relative h-full overflow-hidden rounded-[30px] border border-white/55 bg-white/78 p-6 shadow-[0_28px_90px_rgba(30,41,59,0.10)] backdrop-blur-xl">
+    <section className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-[30px] border border-white/55 bg-white/78 p-6 shadow-[0_28px_90px_rgba(30,41,59,0.10)] backdrop-blur-xl">
       <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-3">
@@ -433,7 +422,7 @@ export default function DigitalHumanTab() {
         </div>
       ) : null}
 
-      <div className="grid h-[calc(100%-4.8rem)] min-h-0 items-stretch gap-5 lg:grid-cols-[minmax(0,1.14fr)_minmax(380px,0.86fr)]">
+      <div className="grid min-h-0 flex-1 items-stretch gap-5 lg:grid-cols-[minmax(0,1.14fr)_minmax(380px,0.86fr)]">
         <div className="flex h-full min-h-0 flex-col gap-4">
           <div className="digital-human-stage relative min-h-[520px] flex-1 overflow-hidden rounded-[28px] border border-slate-200/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
             <canvas ref={canvasRef} className="h-full w-full" />
@@ -573,8 +562,8 @@ export default function DigitalHumanTab() {
               </div>
 
               {activeInputMode === "voice" ? (
-                <div className="rounded-[20px] bg-slate-50/80 px-4 py-5">
-                  <div className="flex flex-col items-center text-center">
+                <div className="rounded-[20px] bg-slate-50/80 p-3">
+                  <div className="voice-input-dock flex min-h-[82px] items-center justify-center rounded-[18px] border border-slate-200/75 bg-white/85 px-5 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
                     <div
                       className={`voice-orb ${isRecording ? "is-recording" : "is-idle"} ${
                         isVoiceActionDisabled ? "opacity-70" : ""
@@ -583,23 +572,15 @@ export default function DigitalHumanTab() {
                       <button
                         type="button"
                         aria-label={voiceButtonLabel}
-                        className={`relative z-10 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-white/70 bg-gradient-to-br from-indigo-500 via-violet-500 to-sky-500 text-white shadow-[0_16px_30px_rgba(99,102,241,0.24)] transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-80 ${
+                        className={`relative z-10 flex h-14 w-14 items-center justify-center rounded-full border border-indigo-100/80 bg-gradient-to-br from-indigo-500 via-violet-500 to-sky-500 text-white shadow-[0_8px_18px_rgba(99,102,241,0.18)] ring-4 ring-indigo-50/80 transition hover:scale-[1.02] hover:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-80 ${
                           isRecording ? "animate-pulse" : ""
                         }`}
                         disabled={isVoiceActionDisabled}
                         onClick={voiceAction}
                       >
-                        {isRecording ? <Square size={30} /> : <Mic size={32} />}
+                        {isRecording ? <Square size={22} /> : <Mic size={24} />}
                       </button>
                     </div>
-
-                    <div className="mt-3 text-[28px] font-semibold tracking-tight text-slate-900">
-                      {voiceButtonLabel}
-                    </div>
-                    <p className="mt-1 text-sm text-slate-400">{voiceSecondaryText}</p>
-                    {recorderStatus && recorderStatus !== "待命" ? (
-                      <p className="mt-1 text-xs text-slate-400">麦克风状态：{recorderStatus}</p>
-                    ) : null}
                   </div>
 
                   {showStopAction ? (

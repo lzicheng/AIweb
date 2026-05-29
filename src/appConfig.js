@@ -12,7 +12,7 @@ const readNumber = (key, fallback) => {
 
 export const APP_CONFIG = {
   opsAssistantApiUrl: readString("VITE_OPS_ASSISTANT_API_URL", "/teams/ops_team/runs"),
-  opsEventsStepStatesUrl: readString("VITE_OPS_EVENTS_STEP_STATES_URL", "/ops-events/step-states"),
+  stepStatusApiUrl: readString("VITE_STEP_STATUS_API_URL", "/api/step-status"),
   alertSituation: {
     dashboardUrl: readString("VITE_ALERT_DASHBOARD_API_URL", "/api/public/dashboard"),
     alertsUrl: readString("VITE_ALERT_ALERTS_API_URL", "/api/public/alerts"),

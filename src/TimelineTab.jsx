@@ -9,11 +9,11 @@ import {
   lerp,
   clamp01,
   normalizeTaskSteps,
-  normalizeExternalStatus,
-  getExternalStepIds,
 } from "./taskTimeline";
+import { fetchStepStatusMap } from "./stepStatusApi";
+import { buildFocusTaskSteps, summarizeFocusTaskSteps } from "./timelineStepState";
 
-const STEP_STATES_API_URL = APP_CONFIG.opsEventsStepStatesUrl;
+const STEP_STATUS_API_URL = APP_CONFIG.stepStatusApiUrl;
 
 const STEP_STATUS_LABELS = {
   pending: "待开始",
@@ -38,8 +38,6 @@ export default function TimelineTab() {
   const timeline = useMemo(() => buildTimelineState(now), [now]);
   const axisRef = useRef(null);
   const dotRefs = useRef([]);
-  const clearedStepAtRef = useRef({});
-  const previousFocusOccurrenceRef = useRef(null);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000);
@@ -48,40 +46,22 @@ export default function TimelineTab() {
 
   useEffect(() => {
     let disposed = false;
+    const focusOcc = timeline.center;
+    const focusTask = DAILY_TASKS[focusOcc.baseIndex];
+    const externalStepIds = normalizeTaskSteps(focusTask, focusOcc.baseIndex)
+      .filter((step) => step.id)
+      .map((step) => step.id);
 
     const pullStepStates = async () => {
       try {
-        const response = await fetch(STEP_STATES_API_URL, {
-          headers: { accept: "application/json" },
+        const nextMap = await fetchStepStatusMap({
+          apiUrl: STEP_STATUS_API_URL,
+          stepIds: externalStepIds,
         });
-        if (!response.ok) return;
-
-        const data = await response.json();
-        if (disposed || !Array.isArray(data?.states)) return;
-
-        const nextMap = {};
-        data.states.forEach((item) => {
-          const stepId = typeof item?.stepId === "string" ? item.stepId : "";
-          if (!stepId) return;
-
-          const updatedAt = typeof item?.updatedAt === "string" ? item.updatedAt : "";
-          const clearedAt = clearedStepAtRef.current[stepId];
-          if (clearedAt && updatedAt && updatedAt <= clearedAt) return;
-
-          if (clearedAt && updatedAt > clearedAt) {
-            delete clearedStepAtRef.current[stepId];
-          }
-
-          nextMap[stepId] = {
-            message: typeof item?.message === "string" ? item.message : "",
-            status: normalizeExternalStatus(item.status),
-            updatedAt,
-          };
-        });
-
+        if (disposed) return;
         setExternalStepStateMap(nextMap);
       } catch {
-        // 事件服务暂不可用时，保持前端默认状态即可
+        // 状态服务暂不可用时，保持前端默认状态即可
       }
     };
 
@@ -92,7 +72,7 @@ export default function TimelineTab() {
       disposed = true;
       window.clearInterval(timer);
     };
-  }, []);
+  }, [timeline.center.baseIndex]);
 
   useLayoutEffect(() => {
     const measure = () => {
@@ -136,79 +116,16 @@ export default function TimelineTab() {
   const focusTask = DAILY_TASKS[focusOcc.baseIndex];
   const nextOcc = timeline.next;
   const nextTask = nextOcc ? DAILY_TASKS[nextOcc.baseIndex] : DAILY_TASKS[0];
-  const focusOccurrenceKey = `${focusOcc.start.toISOString()}-${focusOcc.baseIndex}`;
-
-  useEffect(() => {
-    const previous = previousFocusOccurrenceRef.current;
-    if (!previous) {
-      previousFocusOccurrenceRef.current = {
-        baseIndex: focusOcc.baseIndex,
-        key: focusOccurrenceKey,
-      };
-      return;
-    }
-
-    if (previous.key === focusOccurrenceKey) return;
-
-    const previousTask = DAILY_TASKS[previous.baseIndex];
-    const previousStepIds = getExternalStepIds(previousTask, previous.baseIndex);
-    if (previousStepIds.length > 0) {
-      const clearedAt = new Date().toISOString();
-      previousStepIds.forEach((stepId) => {
-        clearedStepAtRef.current[stepId] = clearedAt;
-      });
-
-      setExternalStepStateMap((currentMap) => {
-        const nextMap = { ...currentMap };
-        previousStepIds.forEach((stepId) => {
-          delete nextMap[stepId];
-        });
-        return nextMap;
-      });
-    }
-
-    previousFocusOccurrenceRef.current = {
-      baseIndex: focusOcc.baseIndex,
-      key: focusOccurrenceKey,
-    };
-  }, [focusOcc.baseIndex, focusOccurrenceKey]);
-
   const focusTaskSteps = useMemo(() => {
-    if (!focusTask) return [];
-
-    const autoStatus = timeline.isCompleted
-      ? "success"
-      : timeline.isArrived
-        ? "running"
-        : "pending";
-    return normalizeTaskSteps(focusTask, focusOcc.baseIndex).map((step) => {
-      const runtime = externalStepStateMap[step.id];
-      const status =
-        step.controlMode === "external"
-          ? normalizeExternalStatus(runtime?.status)
-          : autoStatus;
-
-      return {
-        ...step,
-        message: runtime?.message || "",
-        status,
-      };
+    return buildFocusTaskSteps({
+      externalStepStateMap,
+      task: focusTask,
+      taskIndex: focusOcc.baseIndex,
     });
-  }, [
-    externalStepStateMap,
-    focusOcc.baseIndex,
-    focusTask,
-    timeline.isArrived,
-    timeline.isCompleted,
-  ]);
+  }, [externalStepStateMap, focusOcc.baseIndex, focusTask]);
 
   const focusTaskSummary = useMemo(() => {
-    const statuses = focusTaskSteps.map((step) => step.status);
-    if (statuses.includes("error")) return "任务存在异常，请关注并处理。";
-    if (focusTaskSteps.length > 0 && statuses.every((status) => status === "success"))
-      return "任务步骤已完成。";
-    if (statuses.includes("running")) return "任务执行中。";
-    return "任务等待外部事件或时间驱动更新。";
+    return summarizeFocusTaskSteps(focusTaskSteps);
   }, [focusTaskSteps]);
 
   return (
@@ -351,7 +268,7 @@ export default function TimelineTab() {
 
                   <div className="min-w-0 flex-1">
                     <p className="leading-relaxed">{step.text}</p>
-                    {step.controlMode === "external" ? (
+                    {step.id ? (
                       <>
                         <div className="mt-1 flex items-center gap-2 text-xs">
                           <span
@@ -360,7 +277,7 @@ export default function TimelineTab() {
                               STEP_STATUS_CLASSNAMES.pending
                             }`}
                           >
-                            {STEP_STATUS_LABELS[step.status] || STEP_STATUS_LABELS.pending}
+                            {STEP_STATUS_LABELS[step.status] || step.status || STEP_STATUS_LABELS.pending}
                           </span>
                         </div>
                         {step.message ? (

@@ -15,7 +15,7 @@ export default function App() {
               <Bot size={20} />
             </div>
             <div>
-              <h1 className="text-lg font-semibold leading-tight">Ops Console</h1>
+              <h1 className="text-lg font-semibold leading-tight">数字人大屏</h1>
               <p className="text-xs text-slate-500">SRCB智能运营系统</p>
             </div>
           </div>

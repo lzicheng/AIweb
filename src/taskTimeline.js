@@ -1,7 +1,5 @@
 import { DAILY_TASKS } from "./dailyTasks";
 
-const EXTERNAL_STATUS_FALLBACK = "pending";
-
 export const minutesBetween = (a, b) => (b.getTime() - a.getTime()) / 60000;
 
 export const timeToMinutes = (hhmm) => {
@@ -29,15 +27,11 @@ export const formatDuration = (minutesLeft) => {
   return `${hour} 小时 ${minute} 分钟`;
 };
 
-const makeStepId = (task, taskIndex, stepIndex) =>
-  `${task.time.replace(":", "")}-${taskIndex + 1}-${stepIndex + 1}`;
-
 export const normalizeStep = (rawStep, task, taskIndex, stepIndex) => {
   if (typeof rawStep === "string") {
     return {
-      id: makeStepId(task, taskIndex, stepIndex),
+      id: "",
       text: rawStep,
-      controlMode: "auto",
     };
   }
 
@@ -46,13 +40,10 @@ export const normalizeStep = (rawStep, task, taskIndex, stepIndex) => {
   const text = typeof rawStep.text === "string" ? rawStep.text.trim() : "";
   if (!text) return null;
 
+  const id = typeof rawStep.id === "string" ? rawStep.id.trim() : "";
   return {
-    id:
-      typeof rawStep.id === "string" && rawStep.id.trim()
-        ? rawStep.id
-        : makeStepId(task, taskIndex, stepIndex),
+    id,
     text,
-    controlMode: rawStep.controlMode === "external" ? "external" : "auto",
   };
 };
 
@@ -65,20 +56,8 @@ export const normalizeTaskSteps = (task, taskIndex) => {
 
 export const getExternalStepIds = (task, taskIndex) =>
   normalizeTaskSteps(task, taskIndex)
-    .filter((step) => step.controlMode === "external")
+    .filter((step) => step.id)
     .map((step) => step.id);
-
-export const normalizeExternalStatus = (status) => {
-  if (
-    status === "running" ||
-    status === "success" ||
-    status === "error" ||
-    status === "pending"
-  ) {
-    return status;
-  }
-  return EXTERNAL_STATUS_FALLBACK;
-};
 
 export const buildOccurrenceKey = (occurrence) =>
   `${occurrence.start.toISOString()}-${occurrence.baseIndex}`;

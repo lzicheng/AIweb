@@ -36,10 +36,10 @@ function getSupportedMimeType() {
 
 export function useAudioRecorder(options = {}) {
   const {
-    maxRecordingDurationMs = 10000,
+    maxRecordingDurationMs = 20000,
     onSilence,
     silenceDurationMs = 1400,
-    silenceThreshold = 0.012,
+    silenceThreshold = 0.035,
   } = options;
   const mediaRecorderRef = useRef(null);
   const mediaStreamRef = useRef(null);
@@ -51,7 +51,6 @@ export function useAudioRecorder(options = {}) {
   const sourceNodeRef = useRef(null);
   const monitorFrameRef = useRef(0);
   const silenceStartedAtRef = useRef(0);
-  const hasSpokenRef = useRef(false);
   const autoStopTriggeredRef = useRef(false);
   const onSilenceRef = useRef(onSilence);
   const maxDurationTimerRef = useRef(0);
@@ -105,7 +104,6 @@ export function useAudioRecorder(options = {}) {
     sourceNodeRef.current = null;
     analyserRef.current = null;
     silenceStartedAtRef.current = 0;
-    hasSpokenRef.current = false;
     autoStopTriggeredRef.current = false;
 
     try {
@@ -156,7 +154,6 @@ export function useAudioRecorder(options = {}) {
     setDurationMs(0);
     recordedChunksRef.current = [];
     silenceStartedAtRef.current = 0;
-    hasSpokenRef.current = false;
     autoStopTriggeredRef.current = false;
 
     let stream;
@@ -229,9 +226,8 @@ export function useAudioRecorder(options = {}) {
         const now = Date.now();
 
         if (rms >= silenceThreshold) {
-          hasSpokenRef.current = true;
           silenceStartedAtRef.current = 0;
-        } else if (hasSpokenRef.current) {
+        } else {
           if (!silenceStartedAtRef.current) {
             silenceStartedAtRef.current = now;
           }

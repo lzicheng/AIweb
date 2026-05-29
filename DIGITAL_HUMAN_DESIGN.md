@@ -200,19 +200,21 @@ POST /teams/ops_team/runs
 
 任务数据已独立到 `dailyTasks.js`，这是后续将任务调度逻辑抽成共享模块的基础。
 
-当前事件服务在 `event-server.mjs` 中提供：
+带非空 `id` 的步骤状态改由独立 Step Status API 提供，前端读取接口：
 
 ```text
-GET  /ops-events/health
-GET  /ops-events/step-states
-POST /ops-events/step-events
+GET /api/step-status?stepIds=sdata_db_check,ads_flow_check
 ```
+
+该接口返回最近 30 分钟内每个 `step_id` 的最新状态；前端直接采用数据库返回的
+`status` 字段。未配置 `id` 的步骤不查询数据库，继续走前端时间默认状态。任务脚本自行调用独立服务的
+`POST /api/step-status` 写入 MySQL。
 
 Vite 开发代理当前配置：
 
 ```text
 /teams      -> VITE_OPS_ASSISTANT_PROXY_TARGET，默认 http://localhost:7777
-/ops-events -> VITE_OPS_EVENTS_PROXY_TARGET，默认 http://localhost:8787
+/api/step-status -> VITE_STEP_STATUS_PROXY_TARGET，默认 http://localhost:8000
 /api/v1     -> VITE_DIGITAL_HUMAN_PROXY_TARGET，默认 http://localhost:8000
 /health     -> VITE_DIGITAL_HUMAN_PROXY_TARGET，默认 http://localhost:8000
 ```
@@ -224,8 +226,8 @@ Vite 开发代理当前配置：
 ```text
 VITE_OPS_ASSISTANT_API_URL=/teams/ops_team/runs
 VITE_OPS_ASSISTANT_PROXY_TARGET=http://localhost:7777
-VITE_OPS_EVENTS_STEP_STATES_URL=/ops-events/step-states
-VITE_OPS_EVENTS_PROXY_TARGET=http://localhost:8787
+VITE_STEP_STATUS_API_URL=/api/step-status
+VITE_STEP_STATUS_PROXY_TARGET=http://localhost:8000
 VITE_DIGITAL_HUMAN_ASR_API_URL=/api/v1/asr
 VITE_DIGITAL_HUMAN_HEALTH_URL=/health
 VITE_DIGITAL_HUMAN_TTS_API_URL=/api/v1/tts
