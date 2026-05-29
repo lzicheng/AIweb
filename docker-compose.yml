@@ -1,0 +1,36 @@
+services:
+  web:
+    build:
+      context: .
+    image: dh-operations-web:latest
+    ports:
+      - "${WEB_PORT:-9001}:80"
+    environment:
+      VITE_OPS_ASSISTANT_API_URL: /teams/ops_team/runs
+      VITE_STEP_STATUS_API_URL: /api/step-status
+      VITE_ALERT_DASHBOARD_API_URL: /api/public/dashboard
+      VITE_ALERT_ALERTS_API_URL: /api/public/alerts
+      VITE_DIGITAL_HUMAN_ASR_API_URL: /api/v1/asr
+      VITE_DIGITAL_HUMAN_HEALTH_URL: /health
+      VITE_DIGITAL_HUMAN_TTS_API_URL: /api/v1/tts
+      VITE_DIGITAL_HUMAN_LANGUAGE: zh
+      VITE_DIGITAL_HUMAN_TTS_SPEED: "1.0"
+      VITE_DIGITAL_HUMAN_MODEL_URL: /models/office_m/office_m.model3.json
+      VITE_OPS_ASSISTANT_PROXY_TARGET: http://host.docker.internal:7777
+      VITE_STEP_STATUS_PROXY_TARGET: http://host.docker.internal:8000
+      VITE_ALERT_CONVERGER_PROXY_TARGET: http://host.docker.internal:9541
+      VITE_DIGITAL_HUMAN_PROXY_TARGET: http://host.docker.internal:8002
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - dhoNet
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1/" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+networks:
+  dhoNet:
+    external: true

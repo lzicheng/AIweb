@@ -71,6 +71,37 @@ npm run build
 npm run preview
 ```
 
+## Docker 部署
+
+项目支持通过 Docker Compose 构建并运行生产镜像。镜像采用多阶段构建：先用 Node.js 执行 `npm run build`，再用 Nginx 托管 `dist` 静态文件。
+
+启动：
+
+```bash
+docker compose up --build -d
+```
+
+默认访问地址为 `http://127.0.0.1:8080/`，可以通过 `WEB_PORT` 覆盖宿主机端口：
+
+```bash
+WEB_PORT=4173 docker compose up --build -d
+```
+
+### 运行时配置
+
+容器启动时会根据 `docker-compose.yml` 中的环境变量生成 `/config.js`，前端优先读取 `window.__APP_CONFIG__`。因此接口地址、数字人模型地址、语言和语速等配置可以通过 Compose 调整，重启容器后生效，不需要重新构建前端代码。
+
+`VITE_*_API_URL` 建议保持为同源相对路径，例如 `/api/v1/tts`。Nginx 会根据下列代理目标把请求转发到实际后端：
+
+| 变量 | 默认值 | 用途 |
+| --- | --- | --- |
+| `VITE_OPS_ASSISTANT_PROXY_TARGET` | `http://host.docker.internal:7777` | `/teams` 代理目标 |
+| `VITE_STEP_STATUS_PROXY_TARGET` | `http://host.docker.internal:8000` | `/api/step-status` 代理目标 |
+| `VITE_ALERT_CONVERGER_PROXY_TARGET` | `http://host.docker.internal:9541` | `/api/public` 代理目标 |
+| `VITE_DIGITAL_HUMAN_PROXY_TARGET` | `http://host.docker.internal:8002` | `/api/v1` 和 `/health` 代理目标 |
+
+如果后端服务也放入同一个 Compose 网络，把代理目标改为服务名即可，例如 `http://digital-human:8002`。不要把密钥、Token 或数据库密码写入 `VITE_*` 变量；这些值会暴露给浏览器。
+
 ## 静态演示服务器
 
 项目提供了一个 PowerShell 静态服务器脚本，用于在没有 Vite dev server 的情况下服务 `dist`、`public` 和 Live2D SDK 资源，并代理 `/api/public` 到告警收敛系统。

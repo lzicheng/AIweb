@@ -1,4 +1,8 @@
-const env = import.meta.env || {};
+const runtimeConfig = globalThis.window?.__APP_CONFIG__ || {};
+const env = {
+  ...(import.meta.env || {}),
+  ...runtimeConfig,
+};
 
 const readString = (key, fallback) => {
   const value = env[key];
