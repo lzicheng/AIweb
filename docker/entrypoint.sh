@@ -14,8 +14,22 @@ set -eu
 
 : "${VITE_OPS_ASSISTANT_PROXY_TARGET:=http://host.docker.internal:7777}"
 : "${VITE_STEP_STATUS_PROXY_TARGET:=http://host.docker.internal:8000}"
-: "${VITE_ALERT_CONVERGER_PROXY_TARGET:=http://host.docker.internal:9541}"
+: "${VITE_ALERT_CONVERGER_PROXY_TARGET:=}"
+: "${VITE_ALERT_CONVERGER_HOST:=}"
+: "${VITE_ALERT_CONVERGER_PORT:=}"
 : "${VITE_DIGITAL_HUMAN_PROXY_TARGET:=http://host.docker.internal:8002}"
+
+normalize_host() {
+  printf "%s" "$1" | sed -E 's#^https?://##; s#/*$##'
+}
+
+if [ -n "$VITE_ALERT_CONVERGER_HOST" ] || [ -n "$VITE_ALERT_CONVERGER_PORT" ]; then
+  alert_converger_host="$(normalize_host "$VITE_ALERT_CONVERGER_HOST")"
+  alert_converger_port="$VITE_ALERT_CONVERGER_PORT"
+  VITE_ALERT_CONVERGER_PROXY_TARGET="http://${alert_converger_host:-host.docker.internal}${alert_converger_port:+:${alert_converger_port}}"
+elif [ -z "$VITE_ALERT_CONVERGER_PROXY_TARGET" ]; then
+  VITE_ALERT_CONVERGER_PROXY_TARGET="http://host.docker.internal:9541"
+fi
 
 export VITE_OPS_ASSISTANT_PROXY_TARGET
 export VITE_STEP_STATUS_PROXY_TARGET

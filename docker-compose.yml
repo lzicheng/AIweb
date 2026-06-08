@@ -18,7 +18,8 @@ services:
       VITE_DIGITAL_HUMAN_MODEL_URL: /models/office_m/office_m.model3.json
       VITE_OPS_ASSISTANT_PROXY_TARGET: http://host.docker.internal:7777
       VITE_STEP_STATUS_PROXY_TARGET: http://host.docker.internal:8000
-      VITE_ALERT_CONVERGER_PROXY_TARGET: http://host.docker.internal:9541
+      VITE_ALERT_CONVERGER_HOST: host.docker.internal
+      VITE_ALERT_CONVERGER_PORT: "9541"
       VITE_DIGITAL_HUMAN_PROXY_TARGET: http://host.docker.internal:8002
     extra_hosts:
       - "host.docker.internal:host-gateway"

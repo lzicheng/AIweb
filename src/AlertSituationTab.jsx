@@ -369,7 +369,7 @@ export default function AlertSituationTab() {
         {error ? (
           <div className="display-error">
             <ShieldAlert size={16} />
-            <span>接口暂不可用：{error}。请确认 Alert Converger 后端已启动并监听 8080 端口。</span>
+            <span>接口暂不可用：{error}。请确认 Alert Converger 后端已启动，并检查配置的告警接口 IP 和端口。</span>
           </div>
         ) : null}
 

@@ -54,6 +54,8 @@ npm run dev
 | `VITE_DIGITAL_HUMAN_TTS_SPEED` | TTS 语速 |
 | `VITE_OPS_ASSISTANT_PROXY_TARGET` | 开发环境 `/teams` 代理目标 |
 | `VITE_STEP_STATUS_PROXY_TARGET` | 开发环境 `/api/step-status` 代理目标 |
+| `VITE_ALERT_CONVERGER_HOST` | 开发环境告警态势接口 IP/主机名，优先用于生成 `/api/public` 代理目标 |
+| `VITE_ALERT_CONVERGER_PORT` | 开发环境告警态势接口端口，优先用于生成 `/api/public` 代理目标 |
 | `VITE_ALERT_CONVERGER_PROXY_TARGET` | 开发环境 `/api/public` 代理目标 |
 | `VITE_DIGITAL_HUMAN_PROXY_TARGET` | 开发环境 `/api/v1` 和 `/health` 代理目标 |
 
@@ -97,7 +99,9 @@ WEB_PORT=4173 docker compose up --build -d
 | --- | --- | --- |
 | `VITE_OPS_ASSISTANT_PROXY_TARGET` | `http://host.docker.internal:7777` | `/teams` 代理目标 |
 | `VITE_STEP_STATUS_PROXY_TARGET` | `http://host.docker.internal:8000` | `/api/step-status` 代理目标 |
-| `VITE_ALERT_CONVERGER_PROXY_TARGET` | `http://host.docker.internal:9541` | `/api/public` 代理目标 |
+| `VITE_ALERT_CONVERGER_HOST` | `host.docker.internal` | 告警态势接口 IP/主机名，优先用于生成 `/api/public` 代理目标 |
+| `VITE_ALERT_CONVERGER_PORT` | `9541` | 告警态势接口端口，优先用于生成 `/api/public` 代理目标 |
+| `VITE_ALERT_CONVERGER_PROXY_TARGET` | `http://host.docker.internal:9541` | `/api/public` 代理目标；未配置 host/port 时使用 |
 | `VITE_DIGITAL_HUMAN_PROXY_TARGET` | `http://host.docker.internal:8002` | `/api/v1` 和 `/health` 代理目标 |
 
 如果后端服务也放入同一个 Compose 网络，把代理目标改为服务名即可，例如 `http://digital-human:8002`。不要把密钥、Token 或数据库密码写入 `VITE_*` 变量；这些值会暴露给浏览器。
@@ -115,13 +119,13 @@ npm run build
 从项目根目录启动：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\tools\static-server.ps1 -Port 4173 -ApiProxyTarget http://127.0.0.1:9541
+powershell -ExecutionPolicy Bypass -File .\tools\static-server.ps1 -Port 4173 -AlertConvergerHost 127.0.0.1 -AlertConvergerPort 9541
 ```
 
 如果 Live2D SDK 位于当前项目的上级目录，可以显式指定 SDK 路径：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\tools\static-server.ps1 -Port 4173 -SdkRoot ..\sdk -ApiProxyTarget http://127.0.0.1:9541
+powershell -ExecutionPolicy Bypass -File .\tools\static-server.ps1 -Port 4173 -SdkRoot ..\sdk -AlertConvergerHost 127.0.0.1 -AlertConvergerPort 9541
 ```
 
 启动后访问 `http://127.0.0.1:4173/`。
