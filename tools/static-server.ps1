@@ -3,7 +3,9 @@ param(
   [string]$DistRoot = "dist",
   [string]$PublicRoot = "public",
   [string]$SdkRoot = "sdk",
-  [string]$ApiProxyTarget = "http://127.0.0.1:9541"
+  [string]$ApiProxyTarget = "",
+  [string]$AlertConvergerHost = "127.0.0.1",
+  [int]$AlertConvergerPort = 9541
 )
 
 $ErrorActionPreference = "Stop"
@@ -72,6 +74,22 @@ function Find-FileForRequest([string]$RequestPath) {
   }
 
   return Join-Path $script:DistRootFull "index.html"
+}
+
+function Resolve-ApiProxyTarget([string]$ExplicitTarget, [string]$HostValue, [int]$PortValue) {
+  if (-not [string]::IsNullOrWhiteSpace($ExplicitTarget)) {
+    return $ExplicitTarget.TrimEnd("/")
+  }
+
+  $hostText = if ([string]::IsNullOrWhiteSpace($HostValue)) { "127.0.0.1" } else { $HostValue.Trim() }
+  $hostText = $hostText -replace "^https?://", ""
+  $hostText = $hostText.TrimEnd("/")
+
+  if ($PortValue -gt 0) {
+    return "http://${hostText}:${PortValue}"
+  }
+
+  return "http://${hostText}"
 }
 
 function Write-Response($Client, [int]$StatusCode, [string]$StatusText, [byte[]]$Body, [string]$ContentType, [bool]$HeadOnly) {
@@ -143,7 +161,7 @@ function Write-ProxiedResponse($Client, [string]$RequestPath, [bool]$HeadOnly) {
 $script:DistRootFull = Resolve-RootPath $DistRoot
 $script:PublicRootFull = Resolve-RootPath $PublicRoot
 $script:SdkRootFull = Resolve-RootPath $SdkRoot
-$script:ApiProxyTargetValue = $ApiProxyTarget
+$script:ApiProxyTargetValue = Resolve-ApiProxyTarget $ApiProxyTarget $AlertConvergerHost $AlertConvergerPort
 
 if (-not (Test-Path -LiteralPath (Join-Path $script:DistRootFull "index.html") -PathType Leaf)) {
   throw "Missing dist/index.html. Build the frontend first or provide a valid DistRoot."
