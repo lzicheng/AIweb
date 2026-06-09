@@ -15,6 +15,7 @@ const readNumber = (key, fallback) => {
 };
 
 export const APP_CONFIG = {
+  dailyTasksUrl: readString("VITE_DAILY_TASKS_URL", "/config/daily-tasks.json"),
   opsAssistantApiUrl: readString("VITE_OPS_ASSISTANT_API_URL", "/teams/ops_team/runs"),
   stepStatusApiUrl: readString("VITE_STEP_STATUS_API_URL", "/api/step-status"),
   alertSituation: {

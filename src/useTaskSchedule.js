@@ -5,9 +5,10 @@ import {
   getTaskAtIndex,
 } from "./taskTimeline";
 import { buildTaskAnnouncement } from "./taskAnnouncer";
-import { DAILY_TASKS } from "./dailyTasks";
+import { DEFAULT_DAILY_TASKS } from "./dailyTasks";
 
 export function useTaskSchedule({
+  tasks = DEFAULT_DAILY_TASKS,
   playbackService,
   onTaskChange,
   intervalMs = 1000,
@@ -17,15 +18,15 @@ export function useTaskSchedule({
   const announcedOccurrencesRef = useRef(new Set());
   const mountedRef = useRef(true);
 
-  const timeline = useMemo(() => buildTimelineState(now), [now]);
+  const timeline = useMemo(() => buildTimelineState(now, tasks), [now, tasks]);
 
   const currentOccurrence = timeline.center;
-  const currentTask = getTaskAtIndex(DAILY_TASKS, currentOccurrence.baseIndex);
+  const currentTask = getTaskAtIndex(tasks, currentOccurrence.baseIndex);
   const currentOccurrenceKey = buildOccurrenceKey(currentOccurrence);
 
   const nextOccurrence = timeline.next;
   const nextTask = nextOccurrence
-    ? getTaskAtIndex(DAILY_TASKS, nextOccurrence.baseIndex)
+    ? getTaskAtIndex(tasks, nextOccurrence.baseIndex)
     : null;
 
   useEffect(() => {

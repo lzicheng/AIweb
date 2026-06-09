@@ -44,6 +44,7 @@ npm run dev
 | --- | --- |
 | `VITE_OPS_ASSISTANT_API_URL` | 运营助手运行接口地址 |
 | `VITE_STEP_STATUS_API_URL` | 操作步骤状态读取地址 |
+| `VITE_DAILY_TASKS_URL` | 运行期任务配置 JSON 地址 |
 | `VITE_ALERT_DASHBOARD_API_URL` | 告警态势仪表盘接口 |
 | `VITE_ALERT_ALERTS_API_URL` | 告警列表接口 |
 | `VITE_DIGITAL_HUMAN_ASR_API_URL` | 数字人语音识别接口 |
@@ -92,6 +93,25 @@ WEB_PORT=4173 docker compose up --build -d
 ### 运行时配置
 
 容器启动时会根据 `docker-compose.yml` 中的环境变量生成 `/config.js`，前端优先读取 `window.__APP_CONFIG__`。因此接口地址、数字人模型地址、语言和语速等配置可以通过 Compose 调整，重启容器后生效，不需要重新构建前端代码。
+
+操作时序轴任务也支持运行期配置。默认会读取 `VITE_DAILY_TASKS_URL` 指向的 JSON，例如 `/config/daily-tasks.json`；读取失败或内容不合法时会回退到 `src/dailyTasks.js` 中的内置默认任务。JSON 支持两种格式：
+
+```json
+{
+  "tasks": [
+    {
+      "time": "08:00",
+      "title": "日常巡检",
+      "steps": [
+        { "id": "", "text": "巡检任务说明" },
+        { "id": "db_check", "text": "数据库巡检" }
+      ]
+    }
+  ]
+}
+```
+
+也可以直接使用任务数组作为根节点。生产环境可把 JSON 文件挂载到 Nginx 静态目录，例如挂载到 `/usr/share/nginx/html/config/daily-tasks.json`，再通过 `VITE_DAILY_TASKS_URL=/config/daily-tasks.json` 指向它。前端会定时重新读取该文件，修改 JSON 后无需重新构建前端。
 
 `VITE_*_API_URL` 建议保持为同源相对路径，例如 `/api/v1/tts`。Nginx 会根据下列代理目标把请求转发到实际后端：
 

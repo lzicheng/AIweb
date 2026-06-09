@@ -1,4 +1,4 @@
-export const DAILY_TASKS = [
+export const DEFAULT_DAILY_TASKS = [
   {
     time: "8:00",
     title: "日常巡检",
@@ -421,3 +421,5 @@ export const DAILY_TASKS = [
     ],
   },
 ];
+
+export const DAILY_TASKS = DEFAULT_DAILY_TASKS;

@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { CalendarClock, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { APP_CONFIG } from "./appConfig";
-import { DAILY_TASKS } from "./dailyTasks";
+import { DEFAULT_DAILY_TASKS } from "./dailyTasks";
 import {
   buildTimelineState,
   formatDuration,
@@ -29,13 +29,13 @@ const STEP_STATUS_CLASSNAMES = {
   error: "bg-rose-100 text-rose-700",
 };
 
-export default function TimelineTab() {
+export default function TimelineTab({ tasks = DEFAULT_DAILY_TASKS }) {
   const [now, setNow] = useState(() => new Date());
   const [externalStepStateMap, setExternalStepStateMap] = useState({});
   const [axisWidth, setAxisWidth] = useState(null);
   const [dotCenters, setDotCenters] = useState([]);
 
-  const timeline = useMemo(() => buildTimelineState(now), [now]);
+  const timeline = useMemo(() => buildTimelineState(now, tasks), [now, tasks]);
   const axisRef = useRef(null);
   const dotRefs = useRef([]);
 
@@ -47,7 +47,7 @@ export default function TimelineTab() {
   useEffect(() => {
     let disposed = false;
     const focusOcc = timeline.center;
-    const focusTask = DAILY_TASKS[focusOcc.baseIndex];
+    const focusTask = tasks[focusOcc.baseIndex];
     const externalStepIds = normalizeTaskSteps(focusTask, focusOcc.baseIndex)
       .filter((step) => step.id)
       .map((step) => step.id);
@@ -72,7 +72,7 @@ export default function TimelineTab() {
       disposed = true;
       window.clearInterval(timer);
     };
-  }, [timeline.center.baseIndex]);
+  }, [tasks, timeline.center.baseIndex]);
 
   useLayoutEffect(() => {
     const measure = () => {
@@ -113,9 +113,9 @@ export default function TimelineTab() {
   ]);
 
   const focusOcc = timeline.center;
-  const focusTask = DAILY_TASKS[focusOcc.baseIndex];
+  const focusTask = tasks[focusOcc.baseIndex];
   const nextOcc = timeline.next;
-  const nextTask = nextOcc ? DAILY_TASKS[nextOcc.baseIndex] : DAILY_TASKS[0];
+  const nextTask = nextOcc ? tasks[nextOcc.baseIndex] : tasks[0];
   const focusTaskSteps = useMemo(() => {
     return buildFocusTaskSteps({
       externalStepStateMap,
@@ -172,7 +172,7 @@ export default function TimelineTab() {
 
           <div className="relative z-10 grid grid-cols-5 gap-4">
             {timeline.window.map((occ, index) => {
-              const task = DAILY_TASKS[occ.baseIndex];
+              const task = tasks[occ.baseIndex];
               const isCenter = index === 2;
               const arrived = now.getTime() >= occ.start.getTime();
               const past = now.getTime() >= occ.completeAt.getTime();

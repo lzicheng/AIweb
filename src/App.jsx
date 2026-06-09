@@ -1,10 +1,12 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Bot } from "lucide-react";
 import { APP_TABS } from "./appTabs";
+import { useDailyTasks } from "./useDailyTasks";
 
 export default function App() {
   const [activeTabId, setActiveTabId] = useState(APP_TABS[0].id);
+  const { tasks } = useDailyTasks();
 
   return (
     <div className="dashboard-bg h-screen w-screen overflow-hidden text-slate-900">
@@ -66,7 +68,7 @@ export default function App() {
                   visibility: isActive ? "visible" : "hidden",
                 }}
               >
-                <TabComponent />
+                <TabComponent tasks={tasks} />
               </motion.div>
             );
           })}

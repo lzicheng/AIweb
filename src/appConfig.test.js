@@ -29,6 +29,7 @@ describe("appConfig", () => {
       VITE_DIGITAL_HUMAN_MODEL_URL: "/runtime/model.json",
       VITE_DIGITAL_HUMAN_TTS_API_URL: "/runtime/tts",
       VITE_DIGITAL_HUMAN_TTS_SPEED: "1.25",
+      VITE_DAILY_TASKS_URL: "/runtime/daily-tasks.json",
       VITE_OPS_ASSISTANT_API_URL: "/runtime/ops",
       VITE_STEP_STATUS_API_URL: "/runtime/steps",
     });
@@ -46,6 +47,7 @@ describe("appConfig", () => {
         ttsApiUrl: "/runtime/tts",
         ttsSpeed: 1.25,
       },
+      dailyTasksUrl: "/runtime/daily-tasks.json",
       opsAssistantApiUrl: "/runtime/ops",
       stepStatusApiUrl: "/runtime/steps",
     });

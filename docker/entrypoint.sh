@@ -3,6 +3,7 @@ set -eu
 
 : "${VITE_OPS_ASSISTANT_API_URL:=/teams/ops_team/runs}"
 : "${VITE_STEP_STATUS_API_URL:=/api/step-status}"
+: "${VITE_DAILY_TASKS_URL:=/config/daily-tasks.json}"
 : "${VITE_ALERT_DASHBOARD_API_URL:=/api/public/dashboard}"
 : "${VITE_ALERT_ALERTS_API_URL:=/api/public/alerts}"
 : "${VITE_DIGITAL_HUMAN_ASR_API_URL:=/api/v1/asr}"
@@ -44,6 +45,7 @@ cat > /usr/share/nginx/html/config.js <<EOF
 window.__APP_CONFIG__ = {
   VITE_OPS_ASSISTANT_API_URL: "$(js_escape "$VITE_OPS_ASSISTANT_API_URL")",
   VITE_STEP_STATUS_API_URL: "$(js_escape "$VITE_STEP_STATUS_API_URL")",
+  VITE_DAILY_TASKS_URL: "$(js_escape "$VITE_DAILY_TASKS_URL")",
   VITE_ALERT_DASHBOARD_API_URL: "$(js_escape "$VITE_ALERT_DASHBOARD_API_URL")",
   VITE_ALERT_ALERTS_API_URL: "$(js_escape "$VITE_ALERT_ALERTS_API_URL")",
   VITE_DIGITAL_HUMAN_ASR_API_URL: "$(js_escape "$VITE_DIGITAL_HUMAN_ASR_API_URL")",

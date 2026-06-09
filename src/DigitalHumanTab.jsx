@@ -16,6 +16,7 @@ import { recognizeSpeech } from "./digitalHumanSpeech";
 import { createLive2DRenderer } from "./live2dRenderer";
 import { createContentPlaybackService } from "./contentPlaybackService";
 import { useTaskSchedule } from "./useTaskSchedule";
+import { DEFAULT_DAILY_TASKS } from "./dailyTasks";
 
 function createTimestamp() {
   return new Date().toLocaleTimeString("zh-CN", {
@@ -50,7 +51,7 @@ function formatDuration(durationMs) {
   return `${minutes.toString().padStart(2, "0")}:${restSeconds.toString().padStart(2, "0")}`;
 }
 
-export default function DigitalHumanTab() {
+export default function DigitalHumanTab({ tasks = DEFAULT_DAILY_TASKS }) {
   const [statusText, setStatusText] = useState("待命");
   const [sessionId, setSessionId] = useState(() => createSessionId());
   const [conversationLogs, setConversationLogs] = useState(() => createInitialLogs());
@@ -138,6 +139,7 @@ export default function DigitalHumanTab() {
     minutesToMove,
     nextTask,
   } = useTaskSchedule({
+    tasks,
     playbackService: playerRef.current,
     announceEnabled: taskAnnounceEnabled,
     onTaskChange: ({ task, announcement }) => {
